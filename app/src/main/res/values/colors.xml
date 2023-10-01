@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="calculatorBackground">#F0F0F0</color>
+    <color name="calculatorText">#4B527E</color>
+    <color name="calculatorButtonBackground">#213555</color>
+    <color name="calculatorButtonTextColor">#F0F0F0</color>
+    <color name="calculatorButtonOperatorBackground">#EB6440</color>
+</resources>

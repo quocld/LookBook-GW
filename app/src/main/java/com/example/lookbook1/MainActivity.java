@@ -3,14 +3,10 @@ package com.example.lookbook1;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.material.button.MaterialButton;
-
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
-
 import java.text.DecimalFormat;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -19,6 +15,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     MaterialButton buttonC, buttonDivide, buttonMultiply, buttonPlus, buttonMinus, buttonEquals, buttonPercent;
     MaterialButton button0, button1, button2, button3, button4, button5, button6, button7, button8, button9;
     MaterialButton buttonAC, buttonDot;
+    String expressionToCalculate = "";
+    boolean shouldCalculate = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +24,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         resultTv = findViewById(R.id.result_tv);
         solutionTv = findViewById(R.id.solution_tv);
-
         buttonC = findViewById(R.id.button_c);
         buttonDivide = findViewById(R.id.button_divide);
         buttonMultiply = findViewById(R.id.button_multiply);
@@ -46,7 +43,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button9 = findViewById(R.id.button_9);
         buttonAC = findViewById(R.id.button_ac);
         buttonDot = findViewById(R.id.button_dot);
-
         setClickListeners();
     }
 
@@ -76,43 +72,55 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         MaterialButton button = (MaterialButton) view;
         String buttonText = button.getText().toString();
-        String dataToCalculate = solutionTv.getText().toString();
 
         if (buttonText.equals("AC")) {
             solutionTv.setText("");
             resultTv.setText("0");
+            expressionToCalculate = "";
+            shouldCalculate = false;
             return;
         }
+
         if (buttonText.equals("=")) {
-            solutionTv.setText(resultTv.getText());
+            if (shouldCalculate) {
+                // Tính toán và hiển thị kết quả ở đây
+                String finalResult = getResult(expressionToCalculate);
+                if (!finalResult.equals("Err")) {
+                    DecimalFormat decimalFormat = new DecimalFormat("#.####");
+                    finalResult = decimalFormat.format(Double.parseDouble(finalResult));
+                    resultTv.setText(finalResult);
+                    shouldCalculate = false; // Đặt lại để không tính toán lại khi bấm nút "=" một lần nữa
+                }
+            }
             return;
         }
+
         if (buttonText.equals("C")) {
-            if(dataToCalculate.length()>1){
-                if (!dataToCalculate.isEmpty()) {
-                    dataToCalculate = dataToCalculate.substring(0, dataToCalculate.length() - 1);
-                }
-            }else{
-                solutionTv.setText("");
-                resultTv.setText("0");
-                return;
+            // Xóa một ký tự khỏi biểu thức tính toán
+            if (!expressionToCalculate.isEmpty()) {
+                expressionToCalculate = expressionToCalculate.substring(0, expressionToCalculate.length() - 1);
+                solutionTv.setText(expressionToCalculate);
+                shouldCalculate = true; // Đặt lại để tính toán lại nếu bạn nhấn nút "=" sau đó
             }
-        } else if (buttonText.equals("x")) {
-            dataToCalculate += "*";
-        } else if (buttonText.equals("%")) {
-            dataToCalculate += "*100";
+            return;
+        }
+
+        if (buttonText.equals("%")) {
+            // Chia biểu thức cho 100 và hiển thị kết quả
+            expressionToCalculate = String.valueOf(Double.parseDouble(expressionToCalculate) / 100);
+            solutionTv.setText(expressionToCalculate);
+            shouldCalculate = true;
+            return;
+        }
+
+        // Xử lý các nút số và phép toán
+        if (buttonText.equals("x")) {
+            expressionToCalculate += "*"; // Sử dụng "*" thay vì "x" cho phép nhân
         } else {
-            dataToCalculate = dataToCalculate + buttonText;
+            expressionToCalculate += buttonText;
         }
-        solutionTv.setText(dataToCalculate);
-
-        String finalResult = getResult(dataToCalculate);
-
-        if (!finalResult.equals("Err")) {
-            DecimalFormat decimalFormat = new DecimalFormat("#.####");
-            finalResult = decimalFormat.format(Double.parseDouble(finalResult));
-            resultTv.setText(finalResult);
-        }
+        solutionTv.setText(expressionToCalculate);
+        shouldCalculate = true;
     }
 
     String getResult(String data) {

@@ -6,12 +6,13 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "contacts.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public static final String TABLE_CONTACTS = "contacts";
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_BIRTHDAY = "birthday";
+    public static final String COLUMN_CONTACT_TYPE = "type";
     public static final String COLUMN_EMAIL = "email";
 
     private static final String TABLE_CREATE =
@@ -19,6 +20,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_NAME + " TEXT, " +
                     COLUMN_BIRTHDAY + " TEXT, " +
+                    COLUMN_CONTACT_TYPE + " INTEGER, " +
                     COLUMN_EMAIL + " TEXT " +
                     ")";
 

@@ -11,6 +11,7 @@ import java.text.DecimalFormat;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private boolean isNewCalculation = true;
     TextView resultTv, solutionTv;
     MaterialButton buttonC, buttonDivide, buttonMultiply, buttonPlus, buttonMinus, buttonEquals, buttonPercent;
     MaterialButton button0, button1, button2, button3, button4, button5, button6, button7, button8, button9;
@@ -72,56 +73,56 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         MaterialButton button = (MaterialButton) view;
         String buttonText = button.getText().toString();
-
         if (buttonText.equals("AC")) {
             solutionTv.setText("");
             resultTv.setText("0");
             expressionToCalculate = "";
+            isNewCalculation = true;
             shouldCalculate = false;
             return;
         }
-
-        if (buttonText.equals("=")) {
-            if (shouldCalculate) {
-                // Tính toán và hiển thị kết quả ở đây
-                String finalResult = getResult(expressionToCalculate);
-                if (!finalResult.equals("Err")) {
-                    DecimalFormat decimalFormat = new DecimalFormat("#.####");
-                    finalResult = decimalFormat.format(Double.parseDouble(finalResult));
-                    resultTv.setText(finalResult);
-                    shouldCalculate = false; // Đặt lại để không tính toán lại khi bấm nút "=" một lần nữa
-                }
-            }
-            return;
-        }
-
-        if (buttonText.equals("C")) {
-            // Xóa một ký tự khỏi biểu thức tính toán
-            if (!expressionToCalculate.isEmpty()) {
-                expressionToCalculate = expressionToCalculate.substring(0, expressionToCalculate.length() - 1);
+        if (isNewCalculation) {
+            if (!buttonText.equals("=") && buttonText.matches("[0-9]")) {
+                expressionToCalculate = buttonText;
                 solutionTv.setText(expressionToCalculate);
-                shouldCalculate = true; // Đặt lại để tính toán lại nếu bạn nhấn nút "=" sau đó
+                shouldCalculate = true;
+                isNewCalculation = false;
             }
-            return;
-        }
 
-        if (buttonText.equals("%")) {
-            // Chia biểu thức cho 100 và hiển thị kết quả
-            expressionToCalculate = String.valueOf(Double.parseDouble(expressionToCalculate) / 100);
-            solutionTv.setText(expressionToCalculate);
-            shouldCalculate = true;
-            return;
-        }
-
-        // Xử lý các nút số và phép toán
-        if (buttonText.equals("x")) {
-            expressionToCalculate += "*"; // Sử dụng "*" thay vì "x" cho phép nhân
         } else {
-            expressionToCalculate += buttonText;
+            if (buttonText.equals("=")) {
+                if (shouldCalculate) {
+                    String finalResult = getResult(expressionToCalculate);
+                    if (!finalResult.equals("Err")) {
+                        DecimalFormat decimalFormat = new DecimalFormat("#.####");
+                        finalResult = decimalFormat.format(Double.parseDouble(finalResult));
+                        resultTv.setText(finalResult);
+                        shouldCalculate = false;
+                        isNewCalculation = true;
+                    }
+                }
+            } else if (buttonText.equals("C")) {
+                if (!expressionToCalculate.isEmpty()) {
+                    expressionToCalculate = expressionToCalculate.substring(0, expressionToCalculate.length() - 1);
+                    solutionTv.setText(expressionToCalculate);
+                    shouldCalculate = true;
+                }
+            } else if (buttonText.equals("%")) {
+                expressionToCalculate = String.valueOf(Double.parseDouble(expressionToCalculate) / 100);
+                solutionTv.setText(expressionToCalculate);
+                shouldCalculate = true;
+            } else {
+                if (buttonText.equals("x")) {
+                    expressionToCalculate += "*";
+                } else {
+                    expressionToCalculate += buttonText;
+                }
+                solutionTv.setText(expressionToCalculate);
+                shouldCalculate = true;
+            }
         }
-        solutionTv.setText(expressionToCalculate);
-        shouldCalculate = true;
     }
+
 
     String getResult(String data) {
         try {
